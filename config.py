@@ -32,7 +32,7 @@ class Param:
 
         parser.add_argument("--learning_rate", default=5e-6, type=float)
         
-        parser.add_argument("--total_round", default=5, type=int)
+        parser.add_argument("--total_round", default=2, type=int)
         
         parser.add_argument("--rel_per_task", default=4)
 

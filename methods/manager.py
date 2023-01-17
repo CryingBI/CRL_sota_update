@@ -230,6 +230,10 @@ class Manager(object):
             # set random seed
             random.seed(args.seed+i*100)
 
+            #Information checkpoint
+            EPOCH = i
+            PATH = "model_{}.pt".format(i)
+
             # sampler setup
             sampler = data_sampler(args=args, seed=args.seed+i*100)
             self.id2rel = sampler.id2rel
@@ -323,3 +327,11 @@ class Manager(object):
                 print(test_cur)
                 print(test_total)
                 del self.moment
+
+                torch.save(
+                    {
+                        'epoch':EPOCH,
+                        'model_state_dict': encoder.state_dict(),
+                        'optimizer_state_dict': self.get_optimizer(args, encoder).state_dict()
+                    }, PATH
+                )
