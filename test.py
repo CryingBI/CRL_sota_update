@@ -1,7 +1,2 @@
-import random
-
-
-list = list(range(20))
-
-a = random.sample(list, 10)
+a = "hello {} {}".format(1, 2)
 print(a)

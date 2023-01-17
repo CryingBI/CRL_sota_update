@@ -48,7 +48,7 @@ class Bert_Encoder(nn.Module):
             e11 = []
             e21 = []
             # for each sample in the batch, acquire the positions of its [E11] and [E21]
-            for i in range(inputs.size()[0]):
+            for i in range(inputs.size()[0]): #input size: torch.size([16, 256])
                 tokens = inputs[i].cpu().numpy()
                 e11.append(np.argwhere(tokens == 30522)[0][0])
                 e21.append(np.argwhere(tokens == 30524)[0][0])
@@ -70,7 +70,7 @@ class Bert_Encoder(nn.Module):
             output = output.view(output.size()[0], -1) # [B,N] --> [B,H*2]
             
             output = self.linear_transform(output)
-
+            print("output size: ", output.size())
 
 
         return output

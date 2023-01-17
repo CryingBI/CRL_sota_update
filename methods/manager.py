@@ -232,7 +232,7 @@ class Manager(object):
 
             #Information checkpoint
             EPOCH = i
-            PATH = "model_{}.pt".format(i)
+            PATH = "model_{}_{}.pt".format(args.dataname,i)
 
             # sampler setup
             sampler = data_sampler(args=args, seed=args.seed+i*100)
