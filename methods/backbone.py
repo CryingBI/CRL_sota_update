@@ -70,7 +70,7 @@ class Bert_Encoder(nn.Module):
             output = output.view(output.size()[0], -1) # [B,N] --> [B,H*2]
             
             output = self.linear_transform(output)
-            print("output size: ", output.size())
+            #output.size (16, 768) or (1,768)
 
 
         return output
