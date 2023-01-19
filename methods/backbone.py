@@ -3,6 +3,8 @@ import torch
 import numpy as np
 from transformers import BertModel, BertConfig
 
+#from dataloaders.sampler import get_tokenizer
+
 class Bert_Encoder(nn.Module):
 
     def __init__(self, config, out_token=False):
@@ -28,6 +30,9 @@ class Bert_Encoder(nn.Module):
             self.encoder.resize_token_embeddings(config.vocab_size + config.marker_size)
             self.linear_transform = nn.Linear(self.bert_config.hidden_size*2, self.output_size, bias=True)
         else:
+            #tokenizer = get_tokenizer(config)
+            self.encoder.resize_token_embeddings(config.vocab_size + 1)
+            #self.encoder.config.type_vocab_size = 4
             self.linear_transform = nn.Linear(self.bert_config.hidden_size, self.output_size, bias=True)
 
         self.layer_normalization = nn.LayerNorm([self.output_size])
@@ -55,6 +60,8 @@ class Bert_Encoder(nn.Module):
 
             # input the sample to BERT
             tokens_output = self.encoder(inputs)[0] # [B,N] --> [B,N,H]
+            #size of tokens_output : (16, 256, 768)
+            #print("after encode:",self.encoder(inputs))
             output = []
             # for each sample in the batch, acquire its representations for [E11] and [E21]
             for i in range(len(e11)):
