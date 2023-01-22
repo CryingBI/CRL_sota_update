@@ -4,7 +4,7 @@ import json, os
 from transformers import BertTokenizer
 import numpy as np
 def get_tokenizer(args):
-    if args.pattern == 'entity_marker':
+    if args.pattern == 'entity_marker' or 'maxpooling':
         tokenizer = BertTokenizer.from_pretrained(args.bert_path, additional_special_tokens=["[E11]", "[E12]", "[E21]", "[E22]"])
     elif args.pattern == 'standard':
         tokenizer = BertTokenizer.from_pretrained(args.bert_path)

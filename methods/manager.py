@@ -240,7 +240,7 @@ class Manager(object):
             self.rel2id = sampler.rel2id
             # encoder setup
             encoder = Encoder(args=args).to(args.device)
-
+                
             # initialize memory and prototypes
             num_class = len(sampler.id2rel)
             memorized_samples = {}
