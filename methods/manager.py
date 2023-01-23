@@ -240,7 +240,10 @@ class Manager(object):
             self.rel2id = sampler.rel2id
             # encoder setup
             encoder = Encoder(args=args).to(args.device)
-                
+            if torch.cuda.device_count() > 0:
+                print("Let's use", torch.cuda.device_count(), "GPUs!")
+                encoder = nn.DataParallel(encoder)
+            
             # initialize memory and prototypes
             num_class = len(sampler.id2rel)
             memorized_samples = {}
