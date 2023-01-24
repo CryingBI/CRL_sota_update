@@ -67,7 +67,11 @@ class Bert_Encoder(nn.Module):
             for i in range(len(e11)):
                 if inputs.device.type in ['cuda']:
                     instance_output = torch.index_select(tokens_output, 0, torch.tensor(i).cuda())
+                    check_e11 = torch.index_select(instance_output, 1, torch.tensor(e11[i]).cuda())
+                    check_e21 = torch.index_select(instance_output, 1, torch.tensor(e21[i]).cuda())
                     instance_output = torch.index_select(instance_output, 1, torch.tensor([e11[i], e21[i]]).cuda())
+                    print("sample", i)
+                    print("e11", check_e11[0][0][0:5], "e21:", check_e21[0][0][0:5])
                 else:
                     instance_output = torch.index_select(tokens_output, 0, torch.tensor(i))
                     instance_output = torch.index_select(instance_output, 1, torch.tensor([e11[i], e21[i]]))

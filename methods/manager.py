@@ -228,21 +228,21 @@ class Manager(object):
             test_cur = []
             test_total = []
             # set random seed
-            random.seed(args.seed+i*100)
-
+            #random.seed(args.seed+i*100)
+            random.seed(args.seed+1*100)
             #Information checkpoint
             # EPOCH = i
             # PATH = "model_{}_{}.pt".format(args.dataname,i)
 
             # sampler setup
-            sampler = data_sampler(args=args, seed=args.seed+i*100)
+            sampler = data_sampler(args=args, seed=args.seed+1*100)
             self.id2rel = sampler.id2rel
             self.rel2id = sampler.rel2id
             # encoder setup
             encoder = Encoder(args=args).to(args.device)
-            if torch.cuda.device_count() > 0:
-                print("Let's use", torch.cuda.device_count(), "GPUs!")
-                encoder = nn.DataParallel(encoder)
+            # if torch.cuda.device_count() > 0:
+            #     print("Let's use", torch.cuda.device_count(), "GPUs!")
+            #     encoder = nn.DataParallel(encoder)
             
             # initialize memory and prototypes
             num_class = len(sampler.id2rel)
