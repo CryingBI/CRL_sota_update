@@ -2,7 +2,7 @@ import torch.nn as nn
 import torch
 import numpy as np
 from transformers import BertModel, BertConfig
-
+import random
 #from dataloaders.sampler import get_tokenizer
 
 class Bert_Encoder(nn.Module):
@@ -13,8 +13,7 @@ class Bert_Encoder(nn.Module):
         # load model
         self.encoder = BertModel.from_pretrained(config.bert_path).cuda()
         self.bert_config = BertConfig.from_pretrained(config.bert_path)
-        for param in self.encoder.parameters():
-            param.require_grad = False
+        
 
         # the dimension for the final outputs
         self.output_size = config.encoder_output_size
@@ -27,12 +26,16 @@ class Bert_Encoder(nn.Module):
             raise Exception('Wrong encoding.')
 
         if self.pattern == 'entity_marker' or 'maxpooling' or 'avgpooling':
+            random.seed(2023)
             self.encoder.resize_token_embeddings(config.vocab_size + config.marker_size)
+            for param in self.encoder.parameters():
+                param.require_grad = False
             self.linear_transform = nn.Linear(self.bert_config.hidden_size*2, self.output_size, bias=True)
         elif self.pattern == 'standard':
-            #tokenizer = get_tokenizer(config)
+            random.seed(2023)
             self.encoder.resize_token_embeddings(config.vocab_size + 1)
-            #self.encoder.config.type_vocab_size = 4
+            for param in self.encoder.parameters():
+                param.require_grad = False
             self.linear_transform = nn.Linear(self.bert_config.hidden_size, self.output_size, bias=True)
 
         self.layer_normalization = nn.LayerNorm([self.output_size])
@@ -71,7 +74,7 @@ class Bert_Encoder(nn.Module):
                     check_e21 = torch.index_select(instance_output, 1, torch.tensor(e21[i]).cuda())
                     instance_output = torch.index_select(instance_output, 1, torch.tensor([e11[i], e21[i]]).cuda())
                     print("sample", i)
-                    print("e11", check_e11[0][0][0:5], "e21:", check_e21[0][0][0:5])
+                    print("e11", check_e11[0][0][0:5])
                 else:
                     instance_output = torch.index_select(tokens_output, 0, torch.tensor(i))
                     instance_output = torch.index_select(instance_output, 1, torch.tensor([e11[i], e21[i]]))
