@@ -228,14 +228,14 @@ class Manager(object):
             test_cur = []
             test_total = []
             # set random seed
-            #random.seed(args.seed+i*100)
-            random.seed(args.seed+1*100)
+            random.seed(args.seed+i*100)
+            
             #Information checkpoint
             # EPOCH = i
             # PATH = "model_{}_{}.pt".format(args.dataname,i)
 
             # sampler setup
-            sampler = data_sampler(args=args, seed=args.seed+1*100)
+            sampler = data_sampler(args=args, seed=args.seed+i*100)
             self.id2rel = sampler.id2rel
             self.rel2id = sampler.rel2id
             # encoder setup

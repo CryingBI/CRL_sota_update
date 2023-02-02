@@ -2,7 +2,6 @@ import torch.nn as nn
 import torch
 import numpy as np
 from transformers import BertModel, BertConfig
-import random
 #from dataloaders.sampler import get_tokenizer
 
 class Bert_Encoder(nn.Module):
@@ -26,13 +25,13 @@ class Bert_Encoder(nn.Module):
             raise Exception('Wrong encoding.')
 
         if self.pattern == 'entity_marker' or 'maxpooling' or 'avgpooling':
-            random.seed(2023)
+            torch.manual_seed(2023)
             self.encoder.resize_token_embeddings(config.vocab_size + config.marker_size)
             for param in self.encoder.parameters():
                 param.require_grad = False
             self.linear_transform = nn.Linear(self.bert_config.hidden_size*2, self.output_size, bias=True)
         elif self.pattern == 'standard':
-            random.seed(2023)
+            torch.manual_seed(2023)
             self.encoder.resize_token_embeddings(config.vocab_size + 1)
             for param in self.encoder.parameters():
                 param.require_grad = False
