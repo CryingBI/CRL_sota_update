@@ -239,6 +239,7 @@ class Manager(object):
             self.id2rel = sampler.id2rel
             self.rel2id = sampler.rel2id
             # encoder setup
+            
             encoder = Encoder(args=args).to(args.device)
             # if torch.cuda.device_count() > 0:
             #     print("Let's use", torch.cuda.device_count(), "GPUs!")
@@ -253,7 +254,7 @@ class Manager(object):
             history_relation = []
             proto4repaly = []
             for steps, (training_data, valid_data, test_data, current_relations, historic_test_data, seen_relations) in enumerate(sampler):
-
+                torch.manual_seed(2023)
                 print(current_relations)
                 # Initial
                 train_data_for_initial = []
