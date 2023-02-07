@@ -8,12 +8,11 @@ class Bert_Encoder(nn.Module):
 
     def __init__(self, config, out_token=False):
         super(Bert_Encoder, self).__init__()
-
+        torch.manual_seed(2023)
         # load model
         self.encoder = BertModel.from_pretrained(config.bert_path).cuda()
         self.bert_config = BertConfig.from_pretrained(config.bert_path)
         
-
         # the dimension for the final outputs
         self.output_size = config.encoder_output_size
         self.out_dim = self.output_size
@@ -26,17 +25,14 @@ class Bert_Encoder(nn.Module):
 
         if self.pattern == 'entity_marker' or 'maxpooling' or 'avgpooling':
             self.encoder.resize_token_embeddings(config.vocab_size + config.marker_size)
-            for param in self.encoder.parameters():
-                param.require_grad = False
             self.linear_transform = nn.Linear(self.bert_config.hidden_size*2, self.output_size, bias=True)
         elif self.pattern == 'standard':
             self.encoder.resize_token_embeddings(config.vocab_size + 1)
-            for param in self.encoder.parameters():
-                param.require_grad = False
             self.linear_transform = nn.Linear(self.bert_config.hidden_size, self.output_size, bias=True)
 
         self.layer_normalization = nn.LayerNorm([self.output_size])
-
+        for param in self.encoder.parameters():
+                param.require_grad = False
 
     def get_output_size(self):
         return self.output_size
