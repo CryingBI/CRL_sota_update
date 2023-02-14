@@ -66,7 +66,7 @@ class data_sampler(object):
             args.num_of_test = 140
         elif args.dataname in ['TACRED']:
             args.data_file = os.path.join(args.data_path,"data_with{}_marker_tacred.json".format(use_marker))
-            args.relation_file = os.path.join(args.data_path, "id2rel_tacred.json")                                                                                                                                                                                                                             .json")
+            args.relation_file = os.path.join(args.data_path, "id2rel_tacred.json")
             args.num_of_relation = 40
             args.num_of_train = 420
             args.num_of_val = 140
