@@ -20,3 +20,6 @@ class Encoder(nn.Module):
         xx = self.head(out)
         xx = F.normalize(xx, p=2, dim=1)
         return out, xx
+
+    def bert_forward_2(self, out):
+        pass

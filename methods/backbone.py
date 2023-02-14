@@ -18,12 +18,12 @@ class Bert_Encoder(nn.Module):
         self.out_dim = self.output_size
 
         # find which encoding is used
-        if config.pattern in ['standard', 'entity_marker', 'maxpooling', 'avgpooling']:
+        if config.pattern in ['standard', 'entity_marker', 'maxpooling', 'avgpooling', 'avgpooling2']:
             self.pattern = config.pattern
         else:
             raise Exception('Wrong encoding.')
 
-        if self.pattern == 'entity_marker' or 'maxpooling' or 'avgpooling':
+        if self.pattern == 'entity_marker' or 'maxpooling' or 'avgpooling' or 'avgpooling2':
             self.encoder.resize_token_embeddings(config.vocab_size + config.marker_size)
             self.linear_transform = nn.Linear(self.bert_config.hidden_size*2, self.output_size, bias=True)
         elif self.pattern == 'standard':
@@ -66,7 +66,6 @@ class Bert_Encoder(nn.Module):
                 if inputs.device.type in ['cuda']:
                     instance_output = torch.index_select(tokens_output, 0, torch.tensor(i).cuda())
                     check_e11 = torch.index_select(instance_output, 1, torch.tensor(e11[i]).cuda())
-                    check_e21 = torch.index_select(instance_output, 1, torch.tensor(e21[i]).cuda())
                     instance_output = torch.index_select(instance_output, 1, torch.tensor([e11[i], e21[i]]).cuda())
                     if (i == 1):
                         print("e11", check_e11[0][0][0:5])
@@ -92,6 +91,17 @@ class Bert_Encoder(nn.Module):
                 e12.append(np.argwhere(tokens == 30523)[0][0])
                 e21.append(np.argwhere(tokens == 30524)[0][0])
                 e22.append(np.argwhere(tokens == 30525)[0][0])
+                
+            e11 = str(e11)
+            e21 = str(e21)
+            e12 = str(e12)
+            e22 = str(e22)
+            with open("entityMarker.txt", 'w', encoding='utf-8') as f:
+                f.write(e11 + '\n')
+                f.write(e21 + '\n')
+                f.write(e12 + '\n')
+                f.write(e22 + '\n')
+            exit()
 
             # input the sample to BERT
             tokens_output = self.encoder(inputs)[0] # [B,N] --> [B,N,H]
@@ -188,4 +198,6 @@ class Bert_Encoder(nn.Module):
             output = output.view(output.size()[0], -1) # [B,N] --> [B,H*2]
             #print("outputs size", output.size())
             output = self.linear_transform(output)
-        return output
+        elif self.pattern == 'avgpooling2':
+            pass
+        return output   

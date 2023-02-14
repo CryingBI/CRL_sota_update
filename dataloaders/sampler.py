@@ -6,7 +6,7 @@ import numpy as np
 def get_tokenizer(args):
     if args.pattern == 'entity_marker' or 'maxpooling' or 'avgpooling':
         tokenizer = BertTokenizer.from_pretrained(args.bert_path, additional_special_tokens=["[E11]", "[E12]", "[E21]", "[E22]"])
-    elif args.pattern == 'standard':
+    elif args.pattern == 'standard' or 'avgpooling2':
         tokenizer = BertTokenizer.from_pretrained(args.bert_path)
     return tokenizer
 
@@ -53,7 +53,10 @@ class data_sampler(object):
         self.seen_relations = []
         self.history_test_data = {}
     def set_path(self, args):
-        use_marker = ""
+        if args.pattern == 'avgpooling2':
+            use_marker = "out"
+        else:
+            use_marker = ""
         if args.dataname in ['FewRel']:
             args.data_file = os.path.join(args.data_path,"data_with{}_marker.json".format(use_marker))
             args.relation_file = os.path.join(args.data_path, "id2rel.json")
@@ -63,7 +66,7 @@ class data_sampler(object):
             args.num_of_test = 140
         elif args.dataname in ['TACRED']:
             args.data_file = os.path.join(args.data_path,"data_with{}_marker_tacred.json".format(use_marker))
-            args.relation_file = os.path.join(args.data_path, "id2rel_tacred.json")
+            args.relation_file = os.path.join(args.data_path, "                                                                                                                                                                                                                                 .json")
             args.num_of_relation = 40
             args.num_of_train = 420
             args.num_of_val = 140
