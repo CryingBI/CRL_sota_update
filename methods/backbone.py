@@ -4,6 +4,10 @@ import numpy as np
 from transformers import BertModel, BertConfig
 #from dataloaders.sampler import get_tokenizer
 
+e11 = []
+e21 = []
+e12 = []
+e22 = []
 class Bert_Encoder(nn.Module):
 
     def __init__(self, config, out_token=False):
@@ -80,10 +84,10 @@ class Bert_Encoder(nn.Module):
             output = self.linear_transform(output)
             #output.size (16, 768) or (1,768)
         elif self.pattern == 'maxpooling':
-            e11 = []
-            e21 = []
-            e12 = []
-            e22 = []
+            # e11 = []
+            # e21 = []
+            # e12 = []
+            # e22 = []
 
             for i in range(inputs.size()[0]): #input size: torch.size([16, 256])
                 tokens = inputs[i].cpu().numpy()
@@ -92,16 +96,7 @@ class Bert_Encoder(nn.Module):
                 e21.append(np.argwhere(tokens == 30524)[0][0])
                 e22.append(np.argwhere(tokens == 30525)[0][0])
                 
-            e11 = str(e11)
-            e21 = str(e21)
-            e12 = str(e12)
-            e22 = str(e22)
-            with open("entityMarker.txt", 'w', encoding='utf-8') as f:
-                f.write(e11 + '\n')
-                f.write(e21 + '\n')
-                f.write(e12 + '\n')
-                f.write(e22 + '\n')
-            exit()
+            
 
             # input the sample to BERT
             tokens_output = self.encoder(inputs)[0] # [B,N] --> [B,N,H]
@@ -200,4 +195,5 @@ class Bert_Encoder(nn.Module):
             output = self.linear_transform(output)
         elif self.pattern == 'avgpooling2':
             pass
-        return output   
+        return output
+

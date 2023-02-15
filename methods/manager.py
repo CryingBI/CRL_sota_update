@@ -11,6 +11,7 @@ import random
 from tqdm import tqdm, trange
 from sklearn.cluster import KMeans
 from .utils import osdist
+from utils import hidden_res
 class Manager(object):
     def __init__(self, args):
         super().__init__()
@@ -85,7 +86,7 @@ class Manager(object):
             params
         )
         return optimizer
-    def train_simple_model(self, args, encoder, training_data, epochs):
+    def train_simple_model(self, args, encoder, training_data, epochs, steps):
 
         data_loader = get_data_loader(args, training_data, shuffle=True)
         encoder.train()
@@ -94,24 +95,44 @@ class Manager(object):
         def train_data(data_loader_, name = "", is_mem = False):
             losses = []
             td = tqdm(data_loader_, desc=name)
-            for step, batch_data in enumerate(td):
-                optimizer.zero_grad()
-                labels, tokens, ind = batch_data
-                labels = labels.to(args.device)
-                tokens = torch.stack([x.to(args.device) for x in tokens], dim=0)
-                hidden, reps = encoder.bert_forward(tokens)
-                loss = self.moment.loss(reps, labels)
-                losses.append(loss.item())
-                td.set_postfix(loss = np.array(losses).mean())
-                loss.backward()
-                torch.nn.utils.clip_grad_norm_(encoder.parameters(), args.max_grad_norm)
-                optimizer.step()
-                # update moemnt
-                if is_mem:
-                    self.moment.update_mem(ind, reps.detach())
-                else:
-                    self.moment.update(ind, reps.detach())
-            print(f"{name} loss is {np.array(losses).mean()}")
+            if steps == 1:
+                for step, batch_data in enumerate(td):
+                    optimizer.zero_grad()
+                    labels, tokens, ind = batch_data
+                    labels = labels.to(args.device)
+                    tokens = torch.stack([x.to(args.device) for x in tokens], dim=0)
+                    hidden, reps = encoder.bert_forward(tokens)
+                    loss = self.moment.loss(reps, labels)
+                    losses.append(loss.item())
+                    td.set_postfix(loss = np.array(losses).mean())
+                    loss.backward()
+                    torch.nn.utils.clip_grad_norm_(encoder.parameters(), args.max_grad_norm)
+                    optimizer.step()
+                    # update moemnt
+                    if is_mem:
+                        self.moment.update_mem(ind, reps.detach())
+                    else:
+                        self.moment.update(ind, reps.detach())
+                print(f"{name} loss is {np.array(losses).mean()}")
+            else:
+                for step, batch_data in enumerate(td):
+                    optimizer.zero_grad()
+                    labels, tokens, ind = batch_data
+                    labels = labels.to(args.device)
+                    #tokens = torch.stack([x.to(args.device) for x in tokens], dim=0)
+                    reps = encoder.bert_forward_2(hidden_res)
+                    loss = self.moment.loss(reps, labels)
+                    losses.append(loss.item())
+                    td.set_postfix(loss = np.array(losses).mean())
+                    loss.backward()
+                    torch.nn.utils.clip_grad_norm_(encoder.parameters(), args.max_grad_norm)
+                    optimizer.step()
+                    # update moemnt
+                    if is_mem:
+                        self.moment.update_mem(ind, reps.detach())
+                    else:
+                        self.moment.update(ind, reps.detach())
+                print(f"{name} loss is {np.array(losses).mean()}")
         for epoch_i in range(epochs):
             train_data(data_loader, "init_train_{}".format(epoch_i), is_mem=False)
     def train_mem_model(self, args, encoder, mem_data, proto_mem, epochs, seen_relations):
@@ -264,7 +285,7 @@ class Manager(object):
                 # train model 
                 # no memory. first train with current task
                 self.moment = Moment(args)
-                self.moment.init_moment(args, encoder, train_data_for_initial, is_memory=False)
+                self.moment.init_moment(args, encoder, train_data_for_initial, steps, is_memory=False)
                 self.train_simple_model(args, encoder, train_data_for_initial, args.step1_epochs)
 
                 # repaly
@@ -277,7 +298,7 @@ class Manager(object):
                     for relation in history_relation:
                         train_data_for_memory += memorized_samples[relation]
                     
-                    self.moment.init_moment(args, encoder, train_data_for_memory, is_memory=True)
+                    self.moment.init_moment(args, encoder, train_data_for_memory, steps, is_memory=True)
                     self.train_mem_model(args, encoder, train_data_for_memory, proto4repaly, args.step2_epochs, seen_relations)
 
                 feat_mem = []

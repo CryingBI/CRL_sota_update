@@ -21,5 +21,8 @@ class Encoder(nn.Module):
         xx = F.normalize(xx, p=2, dim=1)
         return out, xx
 
+    #1. add bert forward 2 to freeze bert
     def bert_forward_2(self, out):
-        pass
+        xx = self.head(out)
+        xx = F.normalize(xx, p=2, dim=1)
+        return xx
