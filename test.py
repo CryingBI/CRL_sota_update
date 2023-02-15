@@ -13,3 +13,5 @@ with open("entityMarker.txt", 'w', encoding='utf-8') as f:
     f.write(e11 + '\n')
     f.write(e22)
 
+
+

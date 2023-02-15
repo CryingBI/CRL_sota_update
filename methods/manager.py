@@ -135,7 +135,7 @@ class Manager(object):
                 print(f"{name} loss is {np.array(losses).mean()}")
         for epoch_i in range(epochs):
             train_data(data_loader, "init_train_{}".format(epoch_i), is_mem=False)
-    def train_mem_model(self, args, encoder, mem_data, proto_mem, epochs, seen_relations):
+    def train_mem_model(self, args, encoder, mem_data, proto_mem, epochs, seen_relations, steps):
         history_nums = len(seen_relations) - args.rel_per_task
         if len(proto_mem)>0:
             
@@ -286,7 +286,7 @@ class Manager(object):
                 # no memory. first train with current task
                 self.moment = Moment(args)
                 self.moment.init_moment(args, encoder, train_data_for_initial, steps, is_memory=False)
-                self.train_simple_model(args, encoder, train_data_for_initial, args.step1_epochs)
+                self.train_simple_model(args, encoder, train_data_for_initial, args.step1_epochs, steps)
 
                 # repaly
                 if len(memorized_samples)>0:
@@ -299,7 +299,7 @@ class Manager(object):
                         train_data_for_memory += memorized_samples[relation]
                     
                     self.moment.init_moment(args, encoder, train_data_for_memory, steps, is_memory=True)
-                    self.train_mem_model(args, encoder, train_data_for_memory, proto4repaly, args.step2_epochs, seen_relations)
+                    self.train_mem_model(args, encoder, train_data_for_memory, proto4repaly, args.step2_epochs, seen_relations, steps)
 
                 feat_mem = []
                 proto_mem = []

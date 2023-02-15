@@ -4,10 +4,10 @@ import numpy as np
 from transformers import BertModel, BertConfig
 #from dataloaders.sampler import get_tokenizer
 
-e11 = []
-e21 = []
-e12 = []
-e22 = []
+# e11 = []
+# e21 = []
+# e12 = []
+# e22 = []
 class Bert_Encoder(nn.Module):
 
     def __init__(self, config, out_token=False):
