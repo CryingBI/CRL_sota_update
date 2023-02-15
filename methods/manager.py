@@ -11,7 +11,7 @@ import random
 from tqdm import tqdm, trange
 from sklearn.cluster import KMeans
 from .utils import osdist
-from utils import hidden_res
+from .utils import hidden_res
 class Manager(object):
     def __init__(self, args):
         super().__init__()
