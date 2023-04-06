@@ -105,7 +105,7 @@ class Manager(object):
                     tokens = torch.stack([x.to(args.device) for x in tokens], dim=0)
                     hidden, reps = encoder.bert_forward(tokens)
 
-                    hidden_res[step].append(hidden)
+                    hidden_res.append(hidden)
 
                     loss = self.moment.loss(reps, labels)
                     losses.append(loss.item())
