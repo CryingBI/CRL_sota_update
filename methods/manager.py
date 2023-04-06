@@ -133,8 +133,10 @@ class Manager(object):
                     optimizer.zero_grad()
                     labels, tokens, hidden, ind = batch_data
                     labels = labels.to(args.device)
-
-                    print(hidden)
+                    print(labels.shape)
+                    print(torch.tensor(hidden).shape)
+                    print(torch.tensor(tokens).shape)
+                    print(ind.shape)
                     #tokens = torch.stack([x.to(args.device) for x in tokens], dim=0)
                     #hidden_res_stack = hidden_res[step].detach()
                     hidden_res_stack = torch.stack([x.to(args.device) for x in hidden], dim=0)
