@@ -16,7 +16,7 @@ class hidden_set(Dataset):
     def __getitem__(self, idx):
         return (self.data[idx], idx)
 
-    def collate_fn(self, data, hidden, idx):
+    def collate_fn(self, data):
 
         label = torch.tensor([item[0]['relation'] for item in data])
         tokens = [torch.tensor(item[0]['tokens']) for item in data]
@@ -24,7 +24,7 @@ class hidden_set(Dataset):
         return (
             label,
             tokens,
-            hidden,
+            self.hidden,
             ind
         )
     
