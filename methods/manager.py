@@ -12,7 +12,7 @@ from tqdm import tqdm, trange
 from sklearn.cluster import KMeans
 from .utils import osdist
 
-#hidden_res = []
+hidden_res = []
 
 class Manager(object):
     def __init__(self, args):
@@ -100,7 +100,6 @@ class Manager(object):
             if steps == 0:
                 for step, batch_data in enumerate(td):
                     optimizer.zero_grad()
-                    hidden_res = []
                     labels, tokens, ind = batch_data
                     labels = labels.to(args.device)
                     tokens = torch.stack([x.to(args.device) for x in tokens], dim=0)
