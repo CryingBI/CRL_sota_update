@@ -140,7 +140,7 @@ class Manager(object):
                     reps = encoder.bert_forward_2(hidden_res_stack)
                     loss = self.moment.loss(reps, labels)
                     losses_2.append(loss.item())
-                    td_2.set_postfix(loss = np.array(losses).mean())
+                    td_2.set_postfix(loss = np.array(losses_2).mean())
                     loss.backward()
                     torch.nn.utils.clip_grad_norm_(encoder.parameters(), args.max_grad_norm)
                     optimizer.step()
@@ -149,7 +149,7 @@ class Manager(object):
                         self.moment.update_mem(ind, reps.detach())
                     else:
                         self.moment.update(ind, reps.detach())
-                print(f"{name} loss is {np.array(losses).mean()}")
+                print(f"{name} loss is {np.array(losses_2).mean()}")
         for epoch_i in range(epochs):
             train_data(data_loader, "init_train_{}".format(epoch_i), is_mem=False)
     def train_mem_model(self, args, encoder, mem_data, proto_mem, epochs, seen_relations, steps):
