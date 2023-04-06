@@ -20,6 +20,7 @@ class hidden_set(Dataset):
 
         label = torch.tensor([item[0]['relation'] for item in data])
         tokens = [torch.tensor(item[0]['tokens']) for item in data]
+        self.hidden = torch.tensor(self.hidden)
         ind = torch.tensor([item[1] for item in data])
         return (
             label,

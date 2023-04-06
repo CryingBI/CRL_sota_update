@@ -136,7 +136,7 @@ class Manager(object):
 
                     #tokens = torch.stack([x.to(args.device) for x in tokens], dim=0)
                     #hidden_res_stack = hidden_res[step].detach()
-                    hidden_res_stack = torch.tensor(hidden).detach()
+                    hidden_res_stack = hidden.detach()
                     reps = encoder.bert_forward_2(hidden_res_stack)
                     loss = self.moment.loss(reps, labels)
                     losses_2.append(loss.item())
