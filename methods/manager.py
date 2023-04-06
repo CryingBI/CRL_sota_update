@@ -1,5 +1,6 @@
 from dataloaders.sampler import data_sampler
 from dataloaders.data_loader import get_data_loader
+from dataloaders.data_loader_hidden import get_hidden_loader
 from .model import Encoder
 from .utils import Moment, dot_dist
 import torch
@@ -89,15 +90,21 @@ class Manager(object):
         )
         return optimizer
     def train_simple_model(self, args, encoder, training_data, epochs, steps):
-
-        data_loader = get_data_loader(args, training_data, shuffle=True)
+        
+        if steps == 0:
+            data_loader = get_data_loader(args, training_data, shuffle=True)
+        else:
+            data_loader = get_hidden_loader(args, training_data, hidden_res, shuffle=True)
+        #data_loader = get_data_loader(args, training_data, shuffle=True)
         encoder.train()
 
         optimizer = self.get_optimizer(args, encoder)
         def train_data(data_loader_, name = "", is_mem = False):
-            losses = []
-            td = tqdm(data_loader_, desc=name)
+            # losses = []
+            # td = tqdm(data_loader_, desc=name)
             if steps == 0:
+                losses = []
+                td = tqdm(data_loader_, desc=name)
                 for step, batch_data in enumerate(td):
                     optimizer.zero_grad()
                     labels, tokens, ind = batch_data
@@ -120,12 +127,16 @@ class Manager(object):
                         self.moment.update(ind, reps.detach())
                 print(f"{name} loss is {np.array(losses).mean()}")
             else:
-                for step, batch_data in enumerate(td):
+                losses_2 = []
+                td_2 = tqdm(data_loader_, desc=name)
+                for step, batch_data in enumerate(td_2):
                     optimizer.zero_grad()
-                    labels, tokens, ind = batch_data
+                    labels, tokens, hidden, ind = batch_data
                     labels = labels.to(args.device)
+
                     #tokens = torch.stack([x.to(args.device) for x in tokens], dim=0)
-                    hidden_res_stack = hidden_res[step].detach()
+                    #hidden_res_stack = hidden_res[step].detach()
+                    hidden_res_stack = hidden.detach()
                     reps = encoder.bert_forward_2(hidden_res_stack)
                     loss = self.moment.loss(reps, labels)
                     losses.append(loss.item())
