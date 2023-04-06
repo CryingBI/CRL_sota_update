@@ -24,7 +24,7 @@ class hidden_set(Dataset):
         return (
             label,
             tokens,
-            self.hidden,
+            torch.tensor(self.hidden),
             ind
         )
     
