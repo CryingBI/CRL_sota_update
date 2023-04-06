@@ -35,10 +35,10 @@ class Bert_Encoder(nn.Module):
             self.linear_transform = nn.Linear(self.bert_config.hidden_size, self.output_size, bias=True)
 
         self.layer_normalization = nn.LayerNorm([self.output_size])
-        for param in self.encoder.parameters():
-            param.require_grad = False
-        for param in self.linear_transform.parameters():
-            param.require_grad = False 
+        for param in self.encoder.encoder.parameters():
+            param.requires_grad = False
+        # for param in self.linear_transform.parameters():
+        #     param.require_grad = False 
 
     def get_output_size(self):
         return self.output_size
@@ -71,8 +71,8 @@ class Bert_Encoder(nn.Module):
                     instance_output = torch.index_select(tokens_output, 0, torch.tensor(i).cuda())
                     check_e11 = torch.index_select(instance_output, 1, torch.tensor(e11[i]).cuda())
                     instance_output = torch.index_select(instance_output, 1, torch.tensor([e11[i], e21[i]]).cuda())
-                    if (i == 1):
-                        print("e11", check_e11[0][0][0:5])
+                    # if (i == 1):
+                    #     print("e11", check_e11[0][0][0:5])
                 else:
                     instance_output = torch.index_select(tokens_output, 0, torch.tensor(i))
                     instance_output = torch.index_select(instance_output, 1, torch.tensor([e11[i], e21[i]]))

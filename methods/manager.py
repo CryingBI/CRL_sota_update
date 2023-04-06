@@ -106,7 +106,7 @@ class Manager(object):
                     hidden, reps = encoder.bert_forward(tokens)
 
                     hidden_res[step].append(hidden)
-                    
+
                     loss = self.moment.loss(reps, labels)
                     losses.append(loss.item())
                     td.set_postfix(loss = np.array(losses).mean())
@@ -125,7 +125,8 @@ class Manager(object):
                     labels, tokens, ind = batch_data
                     labels = labels.to(args.device)
                     #tokens = torch.stack([x.to(args.device) for x in tokens], dim=0)
-                    reps = encoder.bert_forward_2(hidden_res)
+                    hidden_res_stack = torch.stack([x.to(args.device) for x in hidden_res], dim=0)
+                    reps = encoder.bert_forward_2(hidden_res_stack)
                     loss = self.moment.loss(reps, labels)
                     losses.append(loss.item())
                     td.set_postfix(loss = np.array(losses).mean())
