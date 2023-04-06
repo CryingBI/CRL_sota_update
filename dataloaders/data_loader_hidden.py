@@ -41,7 +41,7 @@ def get_hidden_loader(config, data, hidden, shuffle = False, drop_last = False, 
         dataset=dataset,
         batch_size=batch_size,
         shuffle=shuffle,
-        pin_memory=True,
+        pin_memory=False,
         num_workers=config.num_workers,
         collate_fn=dataset.collate_fn,
         drop_last=drop_last)
