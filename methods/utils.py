@@ -6,8 +6,6 @@ import numpy as np
 from tqdm import tqdm, trange
 import random
 
-hidden_res = []
-
 class Moment:
     def __init__(self, args) -> None:
         
@@ -41,72 +39,39 @@ class Moment:
         if hidden is not None:
             self.hidden_features[ind] = hidden
     @torch.no_grad()
-    def init_moment(self, args, encoder, datasets, steps, is_memory=False):
+    def init_moment(self, args, encoder, datasets, is_memory=False):
         encoder.eval()
         datalen = len(datasets)
-        if steps != 1:
-            if not is_memory:
-                self.features = torch.zeros(datalen, args.feat_dim).cuda()
-                data_loader = get_data_loader(args, datasets)
-                td = tqdm(data_loader)
-                lbs = []
-                for step, batch_data in enumerate(td):
+        if not is_memory:
+            self.features = torch.zeros(datalen, args.feat_dim).cuda()
+            data_loader = get_data_loader(args, datasets)
+            td = tqdm(data_loader)
+            lbs = []
+            for step, batch_data in enumerate(td):
 
-                    labels, tokens, ind = batch_data
-                    tokens = torch.stack([x.to(args.device) for x in tokens], dim=0) 
-                    reps = encoder.bert_forward_2(hidden_res)
-                    self.update(ind, reps.detach())
-                    lbs.append(labels)
-
-                lbs = torch.cat(lbs)
-                self.labels = lbs.to(args.device)
-            else:
-                self.memlen = datalen
-                self.mem_features = torch.zeros(datalen, args.feat_dim).cuda()
-                self.hidden_features = torch.zeros(datalen, args.encoder_output_size).cuda()
-                lbs = []
-                data_loader = get_data_loader(args, datasets)
-                td = tqdm(data_loader)
-                for step, batch_data in enumerate(td):
-                    labels, tokens, ind = batch_data
-                    tokens = torch.stack([x.to(args.device) for x in tokens], dim=0)
-                    hidden, reps = encoder.bert_forward(tokens)
-                    self.update_mem(ind, reps.detach(), hidden.detach())
-                    lbs.append(labels)
-                lbs = torch.cat(lbs)
-                self.mem_labels = lbs.to(args.device)
-        
+                labels, tokens, ind = batch_data
+                tokens = torch.stack([x.to(args.device) for x in tokens], dim=0)
+                _, reps = encoder.bert_forward(tokens)
+                self.update(ind, reps.detach())
+                lbs.append(labels)
+            lbs = torch.cat(lbs)
+            self.labels = lbs.to(args.device)
         else:
-            if not is_memory:
-                self.features = torch.zeros(datalen, args.feat_dim).cuda()
-                data_loader = get_data_loader(args, datasets)
-                td = tqdm(data_loader)
-                lbs = []
-                for step, batch_data in enumerate(td):
-
-                    labels, tokens, ind = batch_data
-                    tokens = torch.stack([x.to(args.device) for x in tokens], dim=0)
-                    out, reps = encoder.bert_forward(tokens)
-                    self.update(ind, reps.detach())
-                    hidden_res.append(out)
-                    lbs.append(labels)
-                lbs = torch.cat(lbs)
-                self.labels = lbs.to(args.device)
-            else:
-                self.memlen = datalen
-                self.mem_features = torch.zeros(datalen, args.feat_dim).cuda()
-                self.hidden_features = torch.zeros(datalen, args.encoder_output_size).cuda()
-                lbs = []
-                data_loader = get_data_loader(args, datasets)
-                td = tqdm(data_loader)
-                for step, batch_data in enumerate(td):
-                    labels, tokens, ind = batch_data
-                    tokens = torch.stack([x.to(args.device) for x in tokens], dim=0)
-                    hidden, reps = encoder.bert_forward(tokens)
-                    self.update_mem(ind, reps.detach(), hidden.detach())
-                    lbs.append(labels)
-                lbs = torch.cat(lbs)
-                self.mem_labels = lbs.to(args.device)
+            self.memlen = datalen
+            self.mem_features = torch.zeros(datalen, args.feat_dim).cuda()
+            self.hidden_features = torch.zeros(datalen, args.encoder_output_size).cuda()
+            lbs = []
+            data_loader = get_data_loader(args, datasets)
+            td = tqdm(data_loader)
+            for step, batch_data in enumerate(td):
+                labels, tokens, ind = batch_data
+                tokens = torch.stack([x.to(args.device) for x in tokens], dim=0)
+                hidden, reps = encoder.bert_forward(tokens)
+                self.update_mem(ind, reps.detach(), hidden.detach())
+                lbs.append(labels)
+            lbs = torch.cat(lbs)
+            self.mem_labels = lbs.to(args.device)
+        
     def loss(self, x, labels, is_mem=False, mapping=None):
 
         if is_mem:

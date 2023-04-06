@@ -11,7 +11,9 @@ import random
 from tqdm import tqdm, trange
 from sklearn.cluster import KMeans
 from .utils import osdist
-from .utils import hidden_res
+
+hidden_res = [[] for i in range(59)]
+
 class Manager(object):
     def __init__(self, args):
         super().__init__()
@@ -95,13 +97,16 @@ class Manager(object):
         def train_data(data_loader_, name = "", is_mem = False):
             losses = []
             td = tqdm(data_loader_, desc=name)
-            if steps == 1:
+            if steps == 0:
                 for step, batch_data in enumerate(td):
                     optimizer.zero_grad()
                     labels, tokens, ind = batch_data
                     labels = labels.to(args.device)
                     tokens = torch.stack([x.to(args.device) for x in tokens], dim=0)
                     hidden, reps = encoder.bert_forward(tokens)
+
+                    hidden_res[step].append(hidden)
+                    
                     loss = self.moment.loss(reps, labels)
                     losses.append(loss.item())
                     td.set_postfix(loss = np.array(losses).mean())
@@ -285,7 +290,7 @@ class Manager(object):
                 # train model 
                 # no memory. first train with current task
                 self.moment = Moment(args)
-                self.moment.init_moment(args, encoder, train_data_for_initial, steps, is_memory=False)
+                self.moment.init_moment(args, encoder, train_data_for_initial, is_memory=False)
                 self.train_simple_model(args, encoder, train_data_for_initial, args.step1_epochs, steps)
 
                 # repaly

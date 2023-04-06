@@ -1,3 +1,4 @@
-from test import *
+a = "hello world"
+b = "o w"
 
-print(e11)
+print(b in a)
