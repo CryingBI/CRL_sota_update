@@ -125,8 +125,8 @@ class Manager(object):
                     labels, tokens, ind = batch_data
                     labels = labels.to(args.device)
                     #tokens = torch.stack([x.to(args.device) for x in tokens], dim=0)
-                    hidden_res = hidden_res.detach()
-                    hidden_res_stack = hidden_res[step]
+                    hidden_res_copy = hidden_res.detach()
+                    hidden_res_stack = hidden_res_copy[step]
                     reps = encoder.bert_forward_2(hidden_res_stack)
                     loss = self.moment.loss(reps, labels)
                     losses.append(loss.item())
